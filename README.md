@@ -19,10 +19,10 @@ This exporter can be used to collect metrics from Jersey framework (inside Glass
   properties.put(ServerProperties.MONITORING_STATISTICS_ENABLED, true);
   </pre>
   Analogously in web.xml:
-  &lt;pre&gt;
+  <pre>
     &lt;init-param&gt;
          &lt;param-name&gt;jersey.config.server.monitoring.statistics.enabled&lt;/param-name&gt;
          &lt;param-value&gt;true&lt;/param-value&gt;
     &lt;/init-param&gt;
-  &lt;/pre&gt;
- &lt;/p&gt;
+  </pre>
+ </p>
