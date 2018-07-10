@@ -6,12 +6,12 @@ This exporter can be used to collect metrics from Jersey framework (inside Glass
  <p>
   Usage example:
   <pre>
-  new JerseyStatisticsCollector(monitoringStatisticsProvider).register();
+  new JerseyStatisticsCollector(monitoringStatistics).register();
   </pre>
-  Monitoring statistics provider can be injected into JavaEE application like this:
+  Monitoring statistics can be injected into JavaEE application like this:
   <pre>
   @Inject
-  private Provider<MonitoringStatistics> monitoringStatisticsProvider;
+  private MonitoringStatistics monitoringStatistics;
   </pre>
   In order for exporter to work, statistics collection has to be enabled in the ResourceConfig
   subclass:
