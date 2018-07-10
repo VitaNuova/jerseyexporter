@@ -8,7 +8,6 @@ import static org.mockito.Mockito.when;
 import io.prometheus.client.CollectorRegistry;
 import java.util.HashMap;
 import java.util.Map;
-import javax.inject.Provider;
 import org.glassfish.jersey.server.model.ResourceMethod;
 import org.glassfish.jersey.server.monitoring.ExceptionMapperStatistics;
 import org.glassfish.jersey.server.monitoring.MonitoringStatistics;
@@ -20,7 +19,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.jvnet.hk2.internal.IterableProviderImpl;
 import org.powermock.api.mockito.PowerMockito;
 
 public class JerseyStatisticsCollectorTest {
@@ -28,7 +26,6 @@ public class JerseyStatisticsCollectorTest {
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
-  private Provider<MonitoringStatistics> provider;
   private MonitoringStatistics monitoringStatistics;
   private CollectorRegistry collectorRegistry;
   private ExceptionMapperStatistics exceptionMapperStatistics;
@@ -37,9 +34,7 @@ public class JerseyStatisticsCollectorTest {
   @Before
   public void before() {
     collectorRegistry = new CollectorRegistry();
-    provider = mock(IterableProviderImpl.class);
     monitoringStatistics = mock(MonitoringStatistics.class);
-    when(provider.get()).thenReturn(monitoringStatistics);
 
     exceptionMapperStatistics = mock(ExceptionMapperStatistics.class);
     when(monitoringStatistics.getExceptionMapperStatistics()).thenReturn(exceptionMapperStatistics);
@@ -51,16 +46,8 @@ public class JerseyStatisticsCollectorTest {
   @Test
   public void shouldFailIfNoMonitoringStatisticsProviderPassed() {
     expectedException.expect(IllegalArgumentException.class);
-    expectedException.expectMessage("Monitoring statistics provider cannot be null");
-    new JerseyStatisticsCollector(null);
-  }
-
-  @Test
-  public void shouldFailIfNoMonitoringStatisticsAvailable() {
-    expectedException.expect(IllegalStateException.class);
     expectedException.expectMessage("Monitoring statistics cannot be null");
-    when(provider.get()).thenReturn(null);
-    new JerseyStatisticsCollector(provider).register();
+    new JerseyStatisticsCollector(null);
   }
 
   @Test
@@ -75,7 +62,7 @@ public class JerseyStatisticsCollectorTest {
     when(exceptionMapperStatistics.getTotalMappings()).thenReturn(3L);
     when(exceptionMapperStatistics.getExceptionMapperExecutions()).thenReturn(exceptionMapperExecutionCounts);
 
-    new JerseyStatisticsCollector(provider).register(collectorRegistry);
+    new JerseyStatisticsCollector(monitoringStatistics).register(collectorRegistry);
 
     assertThat(collectorRegistry.getSampleValue("jersey_exception_mappings_count_successful", new String[]{}, new String[]{}), is(1.0));
     assertThat(collectorRegistry.getSampleValue("jersey_exception_mappings_count_unsuccessful", new String[]{}, new String[]{}), is(2.0));
@@ -92,7 +79,7 @@ public class JerseyStatisticsCollectorTest {
     responseCodes.put(500, 2L);
     when(responseStatistics.getResponseCodes()).thenReturn(responseCodes);
 
-    new JerseyStatisticsCollector(provider).register(collectorRegistry);
+    new JerseyStatisticsCollector(monitoringStatistics).register(collectorRegistry);
 
     assertThat(collectorRegistry.getSampleValue("jersey_response_count", new String[]{"response_code"}, new String[]{"200"}), is(1.0));
     assertThat(collectorRegistry.getSampleValue("jersey_response_count", new String[]{"response_code"}, new String[]{"500"}), is(2.0));

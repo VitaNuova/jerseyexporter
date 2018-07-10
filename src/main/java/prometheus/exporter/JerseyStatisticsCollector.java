@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import javax.inject.Provider;
 import org.glassfish.jersey.server.model.ResourceMethod;
 import org.glassfish.jersey.server.monitoring.ExceptionMapperStatistics;
 import org.glassfish.jersey.server.monitoring.MonitoringStatistics;
@@ -23,12 +22,12 @@ import org.glassfish.jersey.server.monitoring.TimeWindowStatistics;
  * <p>
  * Usage example:
  * <pre>
- * new JerseyStatisticsCollector(monitoringStatisticsProvider).register();
+ * new JerseyStatisticsCollector(monitoringStatistics).register();
  * </pre>
- * Monitoring statistics provider can be injected into JavaEE application like this:
+ * Monitoring statistics instance can be injected into JavaEE application like this:
  * <pre>
  * @Inject
- * private Provider<MonitoringStatistics> monitoringStatisticsProvider;
+ * private MonitoringStatistics monitoringStatisticsProvider;
  * </pre>
  * In order for exporter to work, statistics collection has to be enabled in the ResourceConfig
  * subclass:
@@ -53,14 +52,14 @@ public class JerseyStatisticsCollector extends Collector {
   /**
    * Creates a new collector for the given monitoring statistics provider.
    *
-   * @param monitoringStatisticsProvider The Jersey monitoring statistics provider to collect
+   * @param monitoringStatistics The Jersey monitoring statistics provider to collect
    * metrics for
    */
-  public JerseyStatisticsCollector(Provider<MonitoringStatistics> monitoringStatisticsProvider) {
-    if (monitoringStatisticsProvider == null) {
-      throw new IllegalArgumentException("Monitoring statistics provider cannot be null");
+  public JerseyStatisticsCollector(MonitoringStatistics monitoringStatistics) {
+    if (monitoringStatistics == null) {
+      throw new IllegalArgumentException("Monitoring statistics cannot be null");
     }
-    this.monitoringStatistics = monitoringStatisticsProvider.get();
+    this.monitoringStatistics = monitoringStatistics;
   }
 
   @Override
@@ -74,9 +73,6 @@ public class JerseyStatisticsCollector extends Collector {
 
   @Override
   public <T extends Collector> T register(CollectorRegistry registry) {
-    if (monitoringStatistics == null) {
-      throw new IllegalStateException("Monitoring statistics cannot be null");
-    }
     return super.register(registry);
   }
 
